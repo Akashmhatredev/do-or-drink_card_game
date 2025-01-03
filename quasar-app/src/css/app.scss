@@ -1,0 +1,13 @@
+// app global css in SCSS form
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html{
+  overflow-x: hidden;
+}
+@layer components{
+  .container{
+    @apply tw-max-w-7xl tw-mx-auto tw-px-4;
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "do-or-drink",
+  "version": "0.0.1",
+  "description": "This is a fun party card game",
+  "author": "akashmhatre <akash.mhatre@incentius.com>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
