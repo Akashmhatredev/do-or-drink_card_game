@@ -23,7 +23,7 @@
               </div>
             </div>
             <div class="tw-flex tw-mt-10 tw-justify-around tw-w-[85vw]">
-              <q-btn @click="step = 1" flat round color="white" size="25px" icon="logout" />
+              <q-btn @click="to_main_menu()" flat round color="white" size="25px" icon="logout" />
               <q-btn :disable="currentIndex == 0" @click="previousText()" flat round color="white" size="25px"
                 icon="undo" />
               <q-btn @click="textToAudio(currentText)" flat round color="white" size="25px" icon="volume_up" />
@@ -254,6 +254,10 @@ export default {
     },
   },
   methods: {
+    to_main_menu(){
+      this.step = 1
+      this.currentIndex = 0
+    },
     second_step(base) {
       const baseMapping = {
         first_base: this.first_base,
