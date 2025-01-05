@@ -1,18 +1,19 @@
 <template>
   <q-page class="tw-bg-black tw-font-mono">
     <div class="tw-flex tw-pb-[120px] tw-justify-center tw-items-center tw-h-screen">
-      <div class=" tw-text-white" v-if="step == 1">
+      <!-- Home Page -->
+      <div class=" tw-text-white" v-if="page == 'home_page'">
         <div class="tw-text-[40px]"> Do or Drink </div>
         <div class="tw-text-center tw-text-[25px] tw-mt-24">
           <div @click="second_step('first_base')" class="tw-my-4">First Base</div>
           <div @click="second_step('second_base')" class="tw-my-4">Second Base</div>
           <div @click="second_step('third_base')" class="tw-my-4">Third Base</div>
-          <div class="tw-my-4">Custom</div>
+          <div @click="to_custom_page()" class="tw-my-4">Custom</div>
         </div>
       </div>
-      <div v-if="step == 2" class="tw-mx-auto tw-max-w-2xl tw-px-4 sm:tw-px-6 lg:tw-max-w-7xl ">
+      <!-- Dare Page -->
+      <div v-if="page == 'dare_page'" class="tw-mx-auto tw-max-w-2xl tw-px-4 sm:tw-px-6 lg:tw-max-w-7xl ">
         <div class="lg:tw-grid lg:tw-auto-rows-min lg:tw-grid-cols-12 lg:tw-gap-x-8 tw-items-center">
-          <!-- Card with Single Direction Turn Animation -->
           <div class="card-container tw-perspective-1000 tw-w-[85vw] tw-h-[70vh] tw-mx-auto tw-cursor-pointer">
             <div @click="nextText"
               class="card tw-w-full tw-h-full tw-transform-style-preserve-3d tw-transition-transform tw-duration-1000 tw-ease-in-out"
@@ -31,15 +32,69 @@
           </div>
         </div>
       </div>
+       <!-- Custom Page -->
+      <div class=" tw-text-white tw-text-center" v-if="page == 'custom_page'">
+        <div class="tw-text-[30px]">Custom Dare Section</div>
+         <!-- Home Input Page -->
+        <div v-if="custom_section_page === 'input_page'" class="tw-text-[18px] tw-mt-24">
+          <div class="tw-flex tw-justify-between tw-my-8">
+            <p class="tw-mt-2">No. of Player</p>
+            <q-input dark dense v-model.number="numberOfPlayers" type="number" outlined style="max-width: 50px;" />
+          </div>
+          <div class="tw-flex tw-justify-between  tw-my-8">
+            <p class="tw-mt-2">No. of Dares per player</p>
+            <q-input dark dense v-model.number="numberOfDaresPerPlayer" type="number" outlined
+              style="max-width: 50px;" />
+          </div>
+          <div class="tw-mt-24">
+            <q-btn @click="to_dare_step()" :disable="numberOfPlayers === 0 || numberOfDaresPerPlayer === 0" flat
+              color="white" size="20px" label="Next" />
+          </div>
+        </div>
+        <!-- Dare Input Page -->
+        <div v-if="custom_section_page === 'dare_page'" class="tw-text-[18px] tw-mt-24">
+          <div class="tw-p-4">
+            <h3>Player {{ currentPlayer }}'s Turn</h3>
+            <p>Enter a dare below ({{ dareCount }}/{{ numberOfDaresPerPlayer }})</p>
+
+            <q-input v-model="currentDare" dark outlined dense placeholder="Enter a dare" class="tw-my-8" />
+            <q-btn label="Add Dare" flat color="white" @click="submitDare"
+              :disable="!currentDare || dareCount >= numberOfDaresPerPlayer" class="tw-mt-2" />
+            <q-btn label="Next Player" flat color="white" @click="nextPlayer"
+              :disable="currentPlayer >= numberOfPlayers || dareCount < numberOfDaresPerPlayer" class="tw-mt-2" />
+
+            <q-btn label="Submit Dares" flat color="white" @click="submitAllDares"
+              :disable="currentPlayer < numberOfPlayers || dareCount < numberOfDaresPerPlayer" class="tw-mt-2" />
+
+            <div v-if="currentPlayerDares.length > 0" class="tw-mt-6 tw-text-white">
+              <h4>Your Dares:</h4>
+              <ul>
+                <li v-for="(dare, index) in currentPlayerDares" :key="index" class="tw-flex tw-items-center tw-gap-2">
+                  <span>{{ dare }}</span>
+                  <q-btn icon="delete" color="white" flat dense @click="deleteDare(index)" />
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 
 <script>
+import { TextToSpeech } from '@capacitor-community/text-to-speech';
 export default {
   data() {
     return {
-      step: 1,
+      currentPlayer: 1,
+      currentDare: "",
+      currentPlayerDares: [],
+      allDares: [],
+      numberOfPlayers: 0,
+      numberOfDaresPerPlayer: 0,
+      custom_section_page: "input_page",
+      page: 'home_page',
       texts: [],
       currentIndex: 0,
       rotationAngle: 0, // Tracks the accumulated rotation angle
@@ -246,16 +301,57 @@ export default {
     };
   },
   computed: {
+    dareCount() {
+      return this.currentPlayerDares.length;
+    },
     currentText() {
       if (this.currentIndex >= this.texts.length) {
-        return "End"; // Show "End" text after all other texts are exhausted
+        return "End";
       }
       return this.texts[this.currentIndex];
     },
   },
   methods: {
-    to_main_menu(){
-      this.step = 1
+    to_custom_page() {
+      this.currentPlayer = 1
+      this.currentDare = ""
+      this.currentPlayerDares = []
+      this.allDares = []
+      this.numberOfPlayers = 0
+      this.numberOfDaresPerPlayer = 0
+      this.custom_section_page = "input_page"
+      this.page = 'custom_page'
+    },
+    deleteDare(index) {
+      this.currentPlayerDares.splice(index, 1);
+    },
+    submitDare() {
+      if (this.currentDare && this.dareCount < this.numberOfDaresPerPlayer) {
+        this.currentPlayerDares.push(this.currentDare.trim());
+        this.currentDare = "";
+      }
+    },
+    nextPlayer() {
+      if (this.currentPlayer < this.numberOfPlayers && this.dareCount === this.numberOfDaresPerPlayer) {
+        this.allDares.push(...this.currentPlayerDares);
+        this.currentPlayer++;
+        this.currentPlayerDares = [];
+        this.currentDare = "";
+      }
+    },
+    submitAllDares() {
+      if (this.dareCount === this.numberOfDaresPerPlayer) {
+        this.allDares.push(...this.currentPlayerDares);
+        console.log("All Dares Submitted:", this.allDares);
+        this.texts = this.allDares.sort(() => Math.random() - 0.5);
+        this.page = 'dare_page';
+      }
+    },
+    to_dare_step() {
+      this.custom_section_page = 'dare_page'
+    },
+    to_main_menu() {
+      this.page = 'home_page'
       this.currentIndex = 0
     },
     second_step(base) {
@@ -274,57 +370,65 @@ export default {
         this.texts = ["Something went wrong go back to main page"];
       }
 
-      this.step = 2;
+      this.page = 'dare_page';
     },
     previousText() {
       if (this.currentIndex === 0) {
-        return; // Stop if already at the first text
+        return;
       }
-      this.rotationAngle -= 720; // Rotate backward
+      this.rotationAngle -= 720;
       setTimeout(() => {
         this.currentIndex--;
         if (this.currentIndex < 0) {
-          this.currentIndex = 0; // Prevent going below the first text
+          this.currentIndex = 0;
         }
-      }, 1000); // Matches the CSS transition duration
+      }, 1000);
     },
     nextText() {
-      // If we are already showing "End", stop further rotation
       if (this.currentText === "End") {
         return;
       }
-      // Rotate and change the text
       this.rotationAngle += 720;
       setTimeout(() => {
         this.currentIndex++;
-        // Check if all texts are shown and set to "End"
         if (this.currentIndex >= this.texts.length) {
-          this.currentIndex = this.texts.length; // Stop at "End"
+          this.currentIndex = this.texts.length;
         }
-      }, 1000); // Matches the CSS transition duration
+      }, 1000);
     },
-    textToAudio(text, lang = "en-US") {
-      // Check if the browser supports the Web Speech API
-      if (!("speechSynthesis" in window)) {
-        console.error("Text-to-Speech is not supported in this browser.");
-        return;
+    // textToAudio(text, lang = "en-US") {
+    //   // Check if the browser supports the Web Speech API
+    //   if (!("speechSynthesis" in window)) {
+    //     console.error("Text-to-Speech is not supported in this browser.");
+    //     return;
+    //   }
+    //   // Create a new SpeechSynthesisUtterance instance
+    //   const utterance = new SpeechSynthesisUtterance(text);
+    //   // Set the language (default is English - US)
+    //   utterance.lang = lang;
+    //   // Optional: Set the voice, pitch, and rate
+    //   utterance.pitch = 1; // Normal pitch
+    //   utterance.rate = 1;  // Normal speed
+    //   // Speak the text
+    //   speechSynthesis.speak(utterance);
+    // }
+    async textToAudio(text, lang = "en-US") {
+      try {
+        await TextToSpeech.speak({
+          text: text,
+          lang: lang,
+          pitch: 1.0,
+          rate: 1.0,
+        });
+      } catch (error) {
+        console.error("Error using Text-to-Speech plugin:", error);
       }
-      // Create a new SpeechSynthesisUtterance instance
-      const utterance = new SpeechSynthesisUtterance(text);
-      // Set the language (default is English - US)
-      utterance.lang = lang;
-      // Optional: Set the voice, pitch, and rate
-      utterance.pitch = 1; // Normal pitch
-      utterance.rate = 1;  // Normal speed
-      // Speak the text
-      speechSynthesis.speak(utterance);
     }
   },
 };
 </script>
 
 <style scoped>
-/* Scoped raw styles for properties not directly available in Tailwind */
 .card-container {
   perspective: 1000px;
 }
