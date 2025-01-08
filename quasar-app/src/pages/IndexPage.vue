@@ -34,6 +34,9 @@
       </div>
        <!-- Custom Page -->
       <div class=" tw-text-white tw-text-center" v-if="page == 'custom_page'">
+        <div class="tw-absolute tw-top-4 tw-left-4">
+          <q-btn flat color="white" label="Back" @click="page = 'home_page'" />
+        </div>
         <div class="tw-text-[30px]">Custom Dare Section</div>
          <!-- Home Input Page -->
         <div v-if="custom_section_page === 'input_page'" class="tw-text-[18px] tw-mt-24">
@@ -69,9 +72,9 @@
             <div v-if="currentPlayerDares.length > 0" class="tw-mt-6 tw-text-white">
               <h4>Your Dares:</h4>
               <ul>
-                <li v-for="(dare, index) in currentPlayerDares" :key="index" class="tw-flex tw-items-center tw-gap-2">
-                  <span>{{ dare }}</span>
-                  <q-btn icon="delete" color="white" flat dense @click="deleteDare(index)" />
+                <li v-for="(dare, index) in currentPlayerDares" :key="index" class="tw-flex tw-justify-between tw-text-[10px] tw-items-center tw-gap-2">
+                  <div>{{ dare }}</div>
+                  <q-btn icon="delete" size="sm" color="white" flat dense @click="deleteDare(index)" />
                 </li>
               </ul>
             </div>
