@@ -1,5 +1,14 @@
 {
   "appId": "card.game.app",
   "appName": "Do or Drink",
-  "webDir": "www"
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "LottieSplashScreen": {
+      "launchAutoHide": true,
+      "animationLocation": "lottie/animation.json",
+      "loop": true,
+      "delay": 3000
+    }
+  }
 }
