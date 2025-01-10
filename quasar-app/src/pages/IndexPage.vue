@@ -15,7 +15,8 @@
       <div v-if="page == 'dare_page'" class="tw-mx-auto tw-max-w-2xl tw-px-4 sm:tw-px-6 lg:tw-max-w-7xl ">
         <div class="lg:tw-grid lg:tw-auto-rows-min lg:tw-grid-cols-12 lg:tw-gap-x-8 tw-items-center">
           <div class="card-container tw-perspective-1000 tw-w-[85vw] tw-h-[70vh] tw-mx-auto tw-cursor-pointer">
-            <div @click="nextText"
+            <div @touchstart="onTouchStart($event)"
+                  @touchend="onTouchEnd($event)"
               class="card tw-w-full tw-h-full tw-transform-style-preserve-3d tw-transition-transform tw-duration-1000 tw-ease-in-out"
               :style="{ transform: `rotateY(${rotationAngle}deg)` }">
               <div
@@ -90,6 +91,8 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech';
 export default {
   data() {
     return {
+      touchStartX: 0,
+      touchEndX: 0,
       currentPlayer: 1,
       currentDare: "",
       currentPlayerDares: [],
@@ -315,6 +318,23 @@ export default {
     },
   },
   methods: {
+    onTouchStart(event) {
+      this.touchStartX = event.changedTouches[0].clientX;
+    },
+    onTouchEnd(event) {
+      this.touchEndX = event.changedTouches[0].clientX;
+      this.handleSwipe();
+    },
+    handleSwipe() {
+      const swipeThreshold = 50; // Minimum swipe distance in pixels
+      if (this.touchEndX - this.touchStartX > swipeThreshold) {
+        // Swipe right
+        this.previousText();
+      } else if (this.touchStartX - this.touchEndX > swipeThreshold) {
+        // Swipe left
+        this.nextText();
+      }
+    },
     to_custom_page() {
       this.currentPlayer = 1
       this.currentDare = ""
