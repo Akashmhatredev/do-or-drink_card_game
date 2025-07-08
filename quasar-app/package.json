@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "This is a fun party card game",
   "productName": "Do or drink",
-  "author": "akashmhatre <akash.mhatre@incentius.com>",
+  "author": "akashmhatre <mhatreakash2308@gmail.com>",
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
