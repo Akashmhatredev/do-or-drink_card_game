@@ -227,9 +227,9 @@ export default {
 
         'Find something sweet, put it in your mouth, and someone else has to take it out with their mouth.',
 
-        'Have someone in the group take a “sexy” selfie of yourself and send it to the last person you texted.',
-
         'Do a pole dance performance without a pole.',
+
+        'Have someone in the group take a “sexy” selfie of yourself and send it to the last person you texted.',
 
         'Change your Facebook status to “I’m coming . . . I’m coming . . .”. Then, one minute later, change it to “I just came.”'
       ],
