@@ -2,7 +2,7 @@
   "name": "do-or-drink",
   "version": "0.0.1",
   "description": "This is a fun party card game",
-  "author": "akashmhatre <akash.mhatre@incentius.com>",
+  "author": "akashmhatre <mhatreakash2308@gmail.com>",
   "private": true,
   "dependencies": {
     "@capacitor-community/text-to-speech": "^5.1.0",
